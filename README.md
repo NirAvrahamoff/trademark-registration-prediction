@@ -2,7 +2,9 @@
 
 Data Mining 2026 course project, Ariel University.
 
-**Team:** Nir Avrahamoff, [partner name]
+**Team:** Nir Avrahamoff, Itamar Rot
+
+Each team member works on a personal branch (`nir`, `itamar`). Finished work is merged into `main` through a pull request.
 
 ## Goal
 
