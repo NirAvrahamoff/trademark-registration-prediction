@@ -46,19 +46,23 @@ Result: 227,489 applications, 15.0% failed. (Two "registered" rows without a reg
 Classification (test set 2019-2022). The model is chosen and the threshold is set on the validation years 2017-2018;
 the test set is used only for this table.
 
-| Model | Val PR-AUC | Test ROC-AUC | Test PR-AUC | Precision | Recall | F1 |
-|---|---|---|---|---|---|---|
-| **Random Forest** | 0.419 | 0.728 | 0.348 | 0.339 | 0.399 | 0.366 |
-| LightGBM | 0.416 | 0.723 | 0.343 | 0.315 | 0.422 | 0.360 |
-| MLP | 0.350 | 0.705 | 0.295 | 0.254 | 0.533 | 0.344 |
-| Logistic Regression | 0.348 | 0.704 | 0.281 | 0.280 | 0.423 | 0.337 |
-| Decision Tree | 0.324 | 0.675 | 0.281 | 0.265 | 0.402 | 0.320 |
-| KNN | 0.299 | 0.652 | 0.259 | 0.248 | 0.386 | 0.302 |
-| Baseline (majority) | 0.144 | 0.500 | 0.139 | 0 | 0 | 0 |
+| Model | Val PR-AUC | Test ROC-AUC | Test PR-AUC | Precision | Recall | F1 | Accuracy |
+|---|---|---|---|---|---|---|---|
+| **LightGBM** | 0.439 | 0.728 | 0.353 | 0.331 | 0.416 | 0.368 | 0.801 |
+| Random Forest | 0.418 | 0.724 | 0.344 | 0.309 | 0.463 | 0.370 | 0.781 |
+| MLP | 0.355 | 0.693 | 0.290 | 0.287 | 0.411 | 0.338 | 0.775 |
+| Logistic Regression | 0.349 | 0.702 | 0.281 | 0.302 | 0.378 | 0.336 | 0.792 |
+| Decision Tree | 0.330 | 0.695 | 0.289 | 0.264 | 0.488 | 0.343 | 0.739 |
+| KNN | 0.298 | 0.646 | 0.256 | 0.234 | 0.429 | 0.303 | 0.724 |
+| Baseline (majority) | 0.144 | 0.500 | 0.139 | 0 | 0 | 0 | 0.861 |
+
+- Checking the 10% highest-risk applications finds 28% of the failures (2.8 times a random 10%).
+- A random 80/20 split would report PR-AUC 0.60 instead of 0.35 (notebook 05).
+- Even with yearly retraining, later years are harder to predict (notebook 05).
 
 Clustering: K-Means++ and Agglomerative (Ward) agree closely (ARI 0.83) with 30 clusters. Service clusters
-(telecom, computer services, restaurants, advertising) fail the most, around 20-23%. Software filed in both classes 9 and 42
-fails at 12%, versus 23% for computer services filed alone.
+(telecom, computer services, restaurants, advertising) fail the most, around 20-23%. Inside the large classes, the goods text
+splits applications into sub-groups whose failure rates differ three- to eightfold (notebook 06).
 
 ## Repository structure
 
@@ -70,6 +74,9 @@ notebooks/      01_data_exploration.ipynb   data checks, target definition, EDA
                 02_feature_engineering.ipynb   features, leakage check
                 03_classification.ipynb   6 models, tuning, imbalance, variants, importance, errors
                 04_clustering.ipynb   K-Means++, Agglomerative, GMM, DBSCAN
+                05_time_evaluation.ipynb   random vs time split, year-by-year evaluation
+                06_within_class_clustering.ipynb   sub-groups inside the large Nice classes
+                07_self_training.ipynb   semi-supervised experiment
 src/            load_data.py (raw file), prepare.py (cleaning and target),
                 features.py (feature engineering), modeling.py (pipeline, models, metrics)
 figures/        plots used in the report
@@ -85,9 +92,10 @@ jupyter notebook
 ```
 
 Run the notebooks in order. Notebook 02 writes `data/processed/features.parquet` (not in git, about 50 MB),
-which notebooks 03 and 04 read. Notebook 03 has `FAST_MODE = True` in its settings cell: it loads the tuned parameters from
-`outputs/best_params.json` and runs in about 25 minutes on a 2-core machine. With `FAST_MODE = False` it runs the
-full hyperparameter search again (about an hour more).
+which notebooks 03 and 04 read. Notebook 03 has a `FAST_MODE` setting at the top. The saved notebook was run with `FAST_MODE = False`
+(full hyperparameter search, about 1.5 hours on a 2-core machine). Set it to `True` to load the tuned parameters
+from `outputs/best_params.json` instead; the run then takes about 15 minutes. Notebooks 04, 05 and 07 read the same
+parameter file, so run notebook 03 first.
 
 The versions in `requirements.txt` are pinned so the notebooks reproduce the reported numbers (Python 3.11 or newer).
 

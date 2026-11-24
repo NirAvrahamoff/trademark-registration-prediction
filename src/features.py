@@ -103,7 +103,7 @@ def history_failure_rate(data, key_col, is_train):
     return rate.to_numpy()
 
 
-def build_features(df_all, data, train_last_year=TRAIN_LAST_YEAR):
+def build_features(df_all, data, train_last_year=TRAIN_LAST_YEAR, train_mask=None):
     """Return the feature table for `data` (the filtered dataset).
 
     df_all: the full cleaned file (used for prior-filing counts).
@@ -112,6 +112,8 @@ def build_features(df_all, data, train_last_year=TRAIN_LAST_YEAR):
         features use labels up to this year only. Notebook 03 also builds a
         version with 2016 so that the validation years (2017-2018) are treated
         exactly like the test years.
+    train_mask: optional boolean array that overrides the year rule (used in
+        notebook 05 to build a random train / test split for comparison).
     """
     df_all = df_all.copy()
     df_all["owner_key"] = _name_key(df_all["owner_en"], df_all["owner_he"])
@@ -125,7 +127,7 @@ def build_features(df_all, data, train_last_year=TRAIN_LAST_YEAR):
     f["filing_date"] = data["filing_date"]
     f["filing_year"] = data["filing_year"]
     f["filing_month"] = data["filing_date"].dt.month
-    f["is_train"] = data["filing_year"] <= train_last_year
+    f["is_train"] = (data["filing_year"] <= train_last_year) if train_mask is None else np.asarray(train_mask)
 
     # categorical flags
     f["route"] = data["route"].map({"לאומי": "national", "בינלאומי": "international",
@@ -186,7 +188,14 @@ TEXT = "goods_text"
 ID_COLUMNS = ["row_id", "filing_date", "filing_year", "is_train", "failed", "attorney_name"]
 
 
+# Columns built but not used by the models.
+# external_registration: its meaning isn't documented, and applications still waiting for
+# examination almost never have it (0.2%) while decided ones do (2-3%), so it may be filled
+# later in the process. It is excluded to be safe.
+EXCLUDED = ["external_registration"]
+
+
 def feature_groups(columns):
     """Split feature columns into numeric / categorical / text for the pipeline."""
-    numeric = [c for c in columns if c not in CATEGORICAL + [TEXT] + ID_COLUMNS]
+    numeric = [c for c in columns if c not in CATEGORICAL + [TEXT] + ID_COLUMNS + EXCLUDED]
     return numeric, CATEGORICAL, TEXT

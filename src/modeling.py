@@ -6,7 +6,7 @@ from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import (average_precision_score, f1_score, precision_recall_curve,
+from sklearn.metrics import (accuracy_score, average_precision_score, f1_score, precision_recall_curve,
                              precision_score, recall_score, roc_auc_score)
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
@@ -88,6 +88,7 @@ def evaluate(y_true, proba, threshold=0.5):
     """Threshold-free metrics plus precision / recall / F1 at a given threshold."""
     pred = (proba >= threshold).astype(int)
     return {
+        "accuracy": accuracy_score(y_true, pred),
         "ROC-AUC": roc_auc_score(y_true, proba) if len(np.unique(proba)) > 1 else 0.5,
         "PR-AUC": average_precision_score(y_true, proba),
         "precision": precision_score(y_true, pred, zero_division=0),

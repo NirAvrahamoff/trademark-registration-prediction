@@ -1,32 +1,32 @@
 {
-  "Logistic Regression":{
-    "model__C":10
+  "Logistic Regression": {
+    "model__C": 10
   },
-  "Decision Tree":{
-    "model__min_samples_leaf":100,
-    "model__max_depth":20
+  "Decision Tree": {
+    "model__min_samples_leaf": 50,
+    "model__max_depth": 10
   },
-  "Random Forest":{
-    "model__min_samples_leaf":5,
-    "model__max_features":0.3,
-    "model__max_depth":null
+  "Random Forest": {
+    "model__min_samples_leaf": 5,
+    "model__max_features": 0.3,
+    "model__max_depth": null
   },
-  "LightGBM":{
-    "model__num_leaves":127,
-    "model__n_estimators":600,
-    "model__min_child_samples":100,
-    "model__learning_rate":0.1
+  "LightGBM": {
+    "model__num_leaves": 63,
+    "model__n_estimators": 600,
+    "model__min_child_samples": 20,
+    "model__learning_rate": 0.05
   },
-  "KNN":{
-    "model__weights":"distance",
-    "model__n_neighbors":51
+  "KNN": {
+    "model__weights": "distance",
+    "model__n_neighbors": 51
   },
-  "MLP":{
-    "model__learning_rate_init":0.003,
-    "model__hidden_layer_sizes":[
-      128,
-      64
+  "MLP": {
+    "model__learning_rate_init": 0.003,
+    "model__hidden_layer_sizes": [
+      64,
+      32
     ],
-    "model__alpha":0.0001
+    "model__alpha": 0.0001
   }
 }
