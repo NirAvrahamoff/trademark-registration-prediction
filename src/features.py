@@ -103,11 +103,15 @@ def history_failure_rate(data, key_col, is_train):
     return rate.to_numpy()
 
 
-def build_features(df_all, data):
+def build_features(df_all, data, train_last_year=TRAIN_LAST_YEAR):
     """Return the feature table for `data` (the filtered dataset).
 
     df_all: the full cleaned file (used for prior-filing counts).
     data:   the decided 2000-2022 applications with the `failed` target.
+    train_last_year: last filing year treated as training data. The failure-rate
+        features use labels up to this year only. Notebook 03 also builds a
+        version with 2016 so that the validation years (2017-2018) are treated
+        exactly like the test years.
     """
     df_all = df_all.copy()
     df_all["owner_key"] = _name_key(df_all["owner_en"], df_all["owner_he"])
@@ -121,7 +125,7 @@ def build_features(df_all, data):
     f["filing_date"] = data["filing_date"]
     f["filing_year"] = data["filing_year"]
     f["filing_month"] = data["filing_date"].dt.month
-    f["is_train"] = data["filing_year"] <= TRAIN_LAST_YEAR
+    f["is_train"] = data["filing_year"] <= train_last_year
 
     # categorical flags
     f["route"] = data["route"].map({"לאומי": "national", "בינלאומי": "international",
@@ -177,7 +181,9 @@ def build_features(df_all, data):
 
 CATEGORICAL = ["route", "registration_type", "mark_script"]
 TEXT = "goods_text"
-ID_COLUMNS = ["row_id", "filing_date", "is_train", "failed", "attorney_name"]
+# filing_year is kept for splitting but not used as a feature: the test years are
+# outside the training range, so a model can't learn anything valid from them
+ID_COLUMNS = ["row_id", "filing_date", "filing_year", "is_train", "failed", "attorney_name"]
 
 
 def feature_groups(columns):

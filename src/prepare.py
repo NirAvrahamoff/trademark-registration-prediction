@@ -2,7 +2,8 @@
 
 Target definition
 -----------------
-An application "failed" if it was decided and never got a registration date.
+An application "failed" if it was decided and never got a registration date
+(the 2 "registered" rows without a date count as registered).
 The status column alone is not a valid label: most applications with status
 "closed" were registered and later lapsed (they have a registration date).
 
@@ -81,7 +82,8 @@ def clean(df_raw):
     df["status"] = df["status"].map(STATUS_EN)
     df["filing_year"] = df["filing_date"].dt.year
     df["is_decided"] = df["status"].isin(DECIDED)
-    df["failed"] = df["registration_date"].isna().astype(int)
+    # a few "registered" rows have no registration date; they are registered, not failures
+    df["failed"] = (df["registration_date"].isna() & (df["status"] != "registered")).astype(int)
     return df
 
 

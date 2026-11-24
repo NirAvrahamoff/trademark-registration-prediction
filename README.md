@@ -34,7 +34,7 @@ An application counts as **failed** if it was decided and never got a registrati
 - Only applications filed in 2000-2022 are kept. Older records look inconsistent, and from 2023 many applications are still pending.
 - Columns filled after the decision are never used as features: status, registration date, expiry date, last update.
 
-Result: 227,489 applications, 15.0% failed.
+Result: 227,489 applications, 15.0% failed. (Two "registered" rows without a registration date count as registered.)
 
 | Split | Filing years | Applications | Failure rate |
 |---|---|---|---|
@@ -43,20 +43,22 @@ Result: 227,489 applications, 15.0% failed.
 
 ## Results so far
 
-Classification (test set 2019-2022, threshold chosen on 2017-2018):
+Classification (test set 2019-2022). The model is chosen and the threshold is set on the validation years 2017-2018;
+the test set is used only for this table.
 
-| Model | ROC-AUC | PR-AUC | Precision | Recall | F1 |
-|---|---|---|---|---|---|
-| Random Forest | 0.730 | 0.350 | 0.322 | 0.446 | 0.374 |
-| LightGBM | 0.724 | 0.344 | 0.313 | 0.426 | 0.361 |
-| MLP | 0.701 | 0.300 | 0.303 | 0.375 | 0.335 |
-| Logistic Regression | 0.706 | 0.282 | 0.302 | 0.363 | 0.330 |
-| Decision Tree | 0.677 | 0.282 | 0.277 | 0.403 | 0.328 |
-| KNN | 0.652 | 0.263 | 0.236 | 0.419 | 0.301 |
-| Baseline (majority) | 0.500 | 0.139 | 0 | 0 | 0 |
+| Model | Val PR-AUC | Test ROC-AUC | Test PR-AUC | Precision | Recall | F1 |
+|---|---|---|---|---|---|---|
+| **Random Forest** | 0.419 | 0.728 | 0.348 | 0.339 | 0.399 | 0.366 |
+| LightGBM | 0.416 | 0.723 | 0.343 | 0.315 | 0.422 | 0.360 |
+| MLP | 0.350 | 0.705 | 0.295 | 0.254 | 0.533 | 0.344 |
+| Logistic Regression | 0.348 | 0.704 | 0.281 | 0.280 | 0.423 | 0.337 |
+| Decision Tree | 0.324 | 0.675 | 0.281 | 0.265 | 0.402 | 0.320 |
+| KNN | 0.299 | 0.652 | 0.259 | 0.248 | 0.386 | 0.302 |
+| Baseline (majority) | 0.144 | 0.500 | 0.139 | 0 | 0 | 0 |
 
-Clustering: K-Means++ and Agglomerative (Ward) agree closely (ARI 0.81) and find about 45 groups that follow the
-Nice classes. Service clusters (software, telecom, restaurants, advertising) fail the most, around 21-24%.
+Clustering: K-Means++ and Agglomerative (Ward) agree closely (ARI 0.83) with 30 clusters. Service clusters
+(telecom, computer services, restaurants, advertising) fail the most, around 20-23%. Software filed in both classes 9 and 42
+fails at 12%, versus 23% for computer services filed alone.
 
 ## Repository structure
 
@@ -83,8 +85,11 @@ jupyter notebook
 ```
 
 Run the notebooks in order. Notebook 02 writes `data/processed/features.parquet` (not in git, about 50 MB),
-which notebooks 03 and 04 read. Notebook 03 takes about an hour on a 2-core machine, mostly the hyperparameter search;
-lower `TUNE_SAMPLE` or `N_ITER` in its settings cell for a faster run.
+which notebooks 03 and 04 read. Notebook 03 has `FAST_MODE = True` in its settings cell: it loads the tuned parameters from
+`outputs/best_params.json` and runs in about 25 minutes on a 2-core machine. With `FAST_MODE = False` it runs the
+full hyperparameter search again (about an hour more).
+
+The versions in `requirements.txt` are pinned so the notebooks reproduce the reported numbers (Python 3.11 or newer).
 
 ## Team contributions
 
