@@ -8,3 +8,5 @@ shap
 matplotlib
 seaborn
 jupyter
+pyarrow
+joblib
