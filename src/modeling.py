@@ -49,7 +49,7 @@ def make_models():
         "Decision Tree": DecisionTreeClassifier(class_weight="balanced", random_state=RANDOM_STATE),
         "Random Forest": RandomForestClassifier(n_estimators=200, class_weight="balanced",
                                                 n_jobs=-1, random_state=RANDOM_STATE),
-        "LightGBM": LGBMClassifier(class_weight="balanced", random_state=RANDOM_STATE,
+        "LightGBM": LGBMClassifier(random_state=RANDOM_STATE,
                                    verbose=-1, n_jobs=-1),
         "KNN": KNeighborsClassifier(n_jobs=-1),
         "MLP": MLPClassifier(early_stopping=True, max_iter=200, random_state=RANDOM_STATE),
