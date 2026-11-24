@@ -1,4 +1,3 @@
-### CODE BY CLAUDE ###
 """Clean the raw trademark data and build the classification target.
 
 Target definition
@@ -95,4 +94,3 @@ def build_dataset(df_clean, first_year=FIRST_YEAR, last_year=LAST_YEAR):
 def load_dataset():
     """Raw file -> cleaned, filtered dataset with the `failed` target."""
     return build_dataset(clean(load_raw()))
-####

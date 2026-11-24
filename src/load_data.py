@@ -1,4 +1,3 @@
-### CODE BY CLAUDE ###
 """Load the raw trademark CSV from data.gov.il, handling its known issues."""
 import csv
 import gzip
@@ -30,4 +29,3 @@ def load_raw(path=RAW_PATH):
 if __name__ == "__main__":
     df = load_raw()
     print(df.shape)
-####
