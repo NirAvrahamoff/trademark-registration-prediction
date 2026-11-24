@@ -1,6 +1,10 @@
 pandas
 numpy
+scipy
 scikit-learn
+imbalanced-learn
+lightgbm
+shap
 matplotlib
 seaborn
 jupyter

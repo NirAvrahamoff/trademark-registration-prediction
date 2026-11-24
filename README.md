@@ -25,14 +25,30 @@ Known data issues in the original file:
 - 42 invalid UTF-8 bytes. Decode with `errors="replace"`.
 - 123 malformed rows with the wrong number of fields (the file has 31 columns). These rows are dropped on load, leaving 364,115 rows.
 
+## Target definition
+
+An application counts as **failed** if it was decided and never got a registration date.
+
+- The `status` column can't be used as the label directly. Most applications with status "closed" (141,354 of 196,066) were registered and lapsed later, and all "non-payment" applications were registered.
+- Only decided applications are kept (status registered, closed or non-payment). The 7,481 applications still in process have no outcome yet.
+- Only applications filed in 2000-2022 are kept. Older records look inconsistent, and from 2023 many applications are still pending.
+- Columns filled after the decision are never used as features: status, registration date, expiry date, last update.
+
+Result: 227,489 applications, 15.0% failed.
+
+| Split | Filing years | Applications | Failure rate |
+|---|---|---|---|
+| Train | 2000-2018 | 180,442 | 15.3% |
+| Test | 2019-2022 | 47,047 | 13.9% |
+
 ## Repository structure
 
 ```
 data/
   raw/          original data from data.gov.il (gzip)
   processed/    cleaned data produced by the code
-notebooks/      analysis notebooks
-src/            reusable code (data loading, features, models)
+notebooks/      01_data_exploration.ipynb: data checks, target definition, EDA
+src/            reusable code: load_data.py (raw file), prepare.py (cleaning and target)
 figures/        plots used in the report
 outputs/        model results and metrics
 ```
@@ -41,6 +57,8 @@ outputs/        model results and metrics
 
 ```bash
 pip install -r requirements.txt
+cd notebooks
+jupyter notebook 01_data_exploration.ipynb
 ```
 
 ## Team contributions
